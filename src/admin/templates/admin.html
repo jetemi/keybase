@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="tabs is-toggle is-centered">
+    <ul>
+      <li class="is-active"><a>Users</a></li>
+      <li><a href="{{ url_for('admin_bp.tags') }}">Tags</a></li>
+      <li><a href="{{ url_for('admin_bp.data') }}">Backup</a></li>
+    </ul>
+  </div>
+
+  {% if users is not none %}
+  {% for key, name, group, email in users %}
+  <div class="columns">
+    <div class="column">{{email}}</div>
+    <div class="column">
+
+      <div class="select is-small">
+        <select id="{{key}}">
+          <option value="admin"{% if group=='admin' %} selected{% endif %}>Admin</option>
+          <option value="editor"{% if group=='editor' %} selected{% endif %}>Editor</option>
+          <option value="viewer"{% if group=='viewer' %} selected{% endif %}>Viewer</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+      No users in the system
+  {% endif %}
+
+  <script>
+    $( "select" )
+      .change(function () {
+	      $.ajax({
+	        type: "POST",
+	        url: "{{ url_for('admin_bp.group')}}",
+	        data : {id:$( this ).attr("id"), group:$(this).children("option:selected").val()},
+	        success: function(data) {
+	        console.log(data);
+            $.notify("Role updated", "success");
+	        }});
+      })
+    </script>
+
+{% endblock %}
+

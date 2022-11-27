@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h1 id="name" class="title is-4">Bookmarks</h1>
+
+  {% if bookmarks is not none %}
+  {% for key, name, pretty, creation in bookmarks %}
+      <a style="display:block;" class="is-size-6" href="{{ url_for('document_bp.doc',id=key,prettyurl=pretty) }}">
+          {{name}}
+      </a>
+      <span class="is-size-7 has-text-weight-light has-text-grey">created: {{creation}}</span>
+      <div style="border-top: .05rem solid #dbdbdb;"></div>
+  {% endfor %}
+  {% else %}
+      <p>You have no bookmarks saved</p>
+  {% endif %}
+{% endblock %}
+

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% set active_page = "browse" %}
+
+{% block content %}
+    <div class="field has-addons">
+        <div class="control is-expanded">
+          <input class="input" type="text" placeholder="Search the knowledge base">
+        </div>
+        <div class="control">
+          <a class="button is-info">
+            Search
+          </a>
+        </div>
+      </div>
+
+      <script type="text/javascript">
+        $(".button").click(function() {
+            window.location.replace("browse?q=" + encodeURIComponent($("input").val()));
+        })
+
+        $(".input").on('keyup', function (e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                window.location.replace("browse?q=" + encodeURIComponent($("input").val()));
+            }
+        });
+
+        $(function() {
+            $(".input").autocomplete({
+                source:function(request, response) {
+                    $.getJSON("{{url_for('document_bp.autocomplete')}}",{
+                        q: encodeURIComponent(request.term), 
+                    }, function(data) {
+                        response(data.matching_results); 
+                    });
+                },
+                minLength: 3,
+                select: function(event, ui) {
+                    console.log(ui.item.id); 
+                    window.location.replace("doc/" + ui.item.id + "/" + ui.item.pretty);
+                }
+            });
+        })
+      </script>
+      
+    {% if keydocument is not none %}
+    {% for key, name, pretty, creation in keydocument %}
+        <a style="display:block;" class="is-size-6" href="{{ url_for('document_bp.doc',id=key,prettyurl=pretty) }}">
+            {{name}}
+        </a>
+        <span class="is-size-7 has-text-weight-light has-text-grey">created: {{creation}}</span>
+        <div style="border-top: .05rem solid #dbdbdb;"></div>
+    {% endfor %}
+
+    {% if pagination is not none %}
+    <div class="mt-4 mb-6">
+      {{ pagination.links }}
+    </div>
+    {% endif %}
+
+    {% else %}
+        No result found, refine your search
+    {% endif %}
+{% endblock %}
+
+
